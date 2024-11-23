@@ -3,16 +3,17 @@ import BibleReader from './components/BibleReader.vue'
 </script>
 
 <template>
-  <main>
-    <BibleReader />
-  </main>
+  <BibleReader />
 </template>
 
 <style>
+body {
+  margin: 0;
+  background-color: #f5f5f5;
+  font-family: Arial, sans-serif;
+}
+
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+  min-height: 100vh;
 }
 </style>

@@ -1,5 +1,6 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, watch } from 'vue'
+import BibleService from '../services/BibleService'
 
 const translations = ref([])
 const selectedTranslation = ref('')
@@ -7,134 +8,157 @@ const books = ref([])
 const selectedBook = ref('')
 const chapters = ref([])
 const selectedChapter = ref('')
-const verseContent = ref('')
+const content = ref('')
 const loading = ref(false)
+const error = ref(null)
 
-const API_KEY = import.meta.env.VITE_BIBLE_API_KEY
-const headers = {
-  'api-key': API_KEY
-}
-
-// Fetch available Bible translations
-const fetchTranslations = async () => {
+// Load translations on component mount
+async function loadTranslations() {
   try {
-    const response = await fetch('https://api.scripture.api.bible/v1/bibles', {
-      headers
-    })
-    const data = await response.json()
-    translations.value = data.data
-  } catch (error) {
-    console.error('Error fetching translations:', error)
+    loading.value = true
+    translations.value = await BibleService.getTranslations()
+  } catch (e) {
+    error.value = 'Failed to load Bible translations'
+    console.error(e)
+  } finally {
+    loading.value = false
   }
 }
 
-// Fetch books for selected translation
-const fetchBooks = async () => {
+// Load books when translation is selected
+async function loadBooks() {
   if (!selectedTranslation.value) return
   try {
-    const response = await fetch(
-      `https://api.scripture.api.bible/v1/bibles/${selectedTranslation.value}/books`,
-      { headers }
-    )
-    const data = await response.json()
-    books.value = data.data
+    loading.value = true
+    books.value = await BibleService.getBooks(selectedTranslation.value)
     selectedBook.value = ''
     chapters.value = []
     selectedChapter.value = ''
-    verseContent.value = ''
-  } catch (error) {
-    console.error('Error fetching books:', error)
+    content.value = ''
+  } catch (e) {
+    error.value = 'Failed to load books'
+    console.error(e)
+  } finally {
+    loading.value = false
   }
 }
 
-// Fetch chapters for selected book
-const fetchChapters = async () => {
+// Load chapters when book is selected
+async function loadChapters() {
   if (!selectedBook.value) return
   try {
-    const response = await fetch(
-      `https://api.scripture.api.bible/v1/bibles/${selectedTranslation.value}/books/${selectedBook.value}/chapters`,
-      { headers }
-    )
-    const data = await response.json()
-    chapters.value = data.data.slice(1) // Remove the introduction chapter
+    loading.value = true
+    chapters.value = await BibleService.getChapters(selectedTranslation.value, selectedBook.value)
+    chapters.value = chapters.value.slice(1) // Remove introduction chapter
     selectedChapter.value = ''
-    verseContent.value = ''
-  } catch (error) {
-    console.error('Error fetching chapters:', error)
+    content.value = ''
+  } catch (e) {
+    error.value = 'Failed to load chapters'
+    console.error(e)
+  } finally {
+    loading.value = false
   }
 }
 
-// Fetch chapter content
-const fetchChapterContent = async () => {
+// Load chapter content
+async function loadContent() {
   if (!selectedChapter.value) return
-  loading.value = true
   try {
-    const response = await fetch(
-      `https://api.scripture.api.bible/v1/bibles/${selectedTranslation.value}/chapters/${selectedChapter.value}`,
-      { headers }
-    )
-    const data = await response.json()
-    verseContent.value = data.data.content
-    loading.value = false
-  } catch (error) {
-    console.error('Error fetching chapter content:', error)
+    loading.value = true
+    const data = await BibleService.getChapterContent(selectedTranslation.value, selectedChapter.value)
+    content.value = data.content
+  } catch (e) {
+    error.value = 'Failed to load chapter content'
+    console.error(e)
+  } finally {
     loading.value = false
   }
 }
 
-// Watch for changes in selections
-watch(selectedTranslation, fetchBooks)
-watch(selectedBook, fetchChapters)
-watch(selectedChapter, fetchChapterContent)
+// Watch for selection changes
+watch(selectedTranslation, loadBooks)
+watch(selectedBook, loadChapters)
+watch(selectedChapter, loadContent)
 
-onMounted(fetchTranslations)
+// Initial load of translations
+loadTranslations()
 </script>
 
 <template>
   <div class="bible-reader">
     <h1>Bible Reader</h1>
-    
+
+    <div v-if="error" class="error">
+      {{ error }}
+    </div>
+
     <div class="controls">
-      <!-- Translation Selection -->
-      <div class="control-group">
+      <!-- Translation selector -->
+      <div class="select-group">
         <label for="translation">Translation:</label>
-        <select id="translation" v-model="selectedTranslation">
-          <option value="">Select Translation</option>
-          <option v-for="translation in translations" :key="translation.id" :value="translation.id">
+        <select 
+          id="translation" 
+          v-model="selectedTranslation"
+          :disabled="loading"
+        >
+          <option value="">Select a translation</option>
+          <option 
+            v-for="translation in translations" 
+            :key="translation.id" 
+            :value="translation.id"
+          >
             {{ translation.name }}
           </option>
         </select>
       </div>
 
-      <!-- Book Selection -->
-      <div class="control-group">
+      <!-- Book selector -->
+      <div class="select-group">
         <label for="book">Book:</label>
-        <select id="book" v-model="selectedBook" :disabled="!selectedTranslation">
-          <option value="">Select Book</option>
-          <option v-for="book in books" :key="book.id" :value="book.id">
+        <select 
+          id="book" 
+          v-model="selectedBook"
+          :disabled="loading || !selectedTranslation"
+        >
+          <option value="">Select a book</option>
+          <option 
+            v-for="book in books" 
+            :key="book.id" 
+            :value="book.id"
+          >
             {{ book.name }}
           </option>
         </select>
       </div>
 
-      <!-- Chapter Selection -->
-      <div class="control-group">
+      <!-- Chapter selector -->
+      <div class="select-group">
         <label for="chapter">Chapter:</label>
-        <select id="chapter" v-model="selectedChapter" :disabled="!selectedBook">
-          <option value="">Select Chapter</option>
-          <option v-for="chapter in chapters" :key="chapter.id" :value="chapter.id">
+        <select 
+          id="chapter" 
+          v-model="selectedChapter"
+          :disabled="loading || !selectedBook"
+        >
+          <option value="">Select a chapter</option>
+          <option 
+            v-for="chapter in chapters" 
+            :key="chapter.id" 
+            :value="chapter.id"
+          >
             {{ chapter.number }}
           </option>
         </select>
       </div>
     </div>
 
-    <!-- Content Display -->
+    <!-- Content display -->
     <div class="content">
-      <div v-if="loading" class="loading">Loading...</div>
-      <div v-else-if="verseContent" v-html="verseContent" class="verse-content"></div>
+      <div v-if="loading" class="loading">
+        Loading...
+      </div>
+      <div v-else-if="content" v-html="content" class="scripture"></div>
       <div v-else class="placeholder">
-        Select a translation, book, and chapter to start reading
+        Select a translation, book, and chapter to begin reading
       </div>
     </div>
   </div>
@@ -147,56 +171,86 @@ onMounted(fetchTranslations)
   padding: 20px;
 }
 
+h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 2rem;
+}
+
 .controls {
   display: flex;
-  gap: 20px;
-  margin-bottom: 30px;
+  gap: 1rem;
+  margin-bottom: 2rem;
   flex-wrap: wrap;
 }
 
-.control-group {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+.select-group {
+  flex: 1;
+  min-width: 200px;
 }
 
 label {
-  font-weight: 500;
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #666;
 }
 
 select {
-  padding: 8px;
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
   border-radius: 4px;
-  border: 1px solid #ccc;
-  min-width: 200px;
+  background-color: white;
+}
+
+select:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
 }
 
 .content {
   background: white;
-  padding: 20px;
+  padding: 2rem;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .loading {
   text-align: center;
-  padding: 20px;
+  color: #666;
+}
+
+.error {
+  background-color: #fee;
+  color: #c00;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
 }
 
 .placeholder {
   text-align: center;
   color: #666;
-  padding: 40px 20px;
 }
 
-.verse-content {
+.scripture {
   line-height: 1.6;
 }
 
-/* Style the verse numbers */
-.verse-content sup {
+/* Style verse numbers */
+.scripture sup {
   color: #666;
-  margin-right: 4px;
-  font-weight: 500;
+  font-size: 0.75em;
+  margin-right: 0.25em;
+}
+
+@media (max-width: 768px) {
+  .controls {
+    flex-direction: column;
+  }
+
+  .select-group {
+    width: 100%;
+  }
 }
 </style>
