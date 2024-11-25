@@ -1,0 +1,140 @@
+/* Base mobile styles */
+@media (max-width: 768px) {
+    .wrapper {
+      padding: 0.5rem;
+      max-width: 100%;
+    }
+  
+    .panel-group {
+      flex-direction: column;
+    }
+  
+    .poke-info {
+      width: 100%;
+    }
+  
+    .field-info {
+      width: 100%;
+    }
+  
+    .holder-0 {
+      width: 100%;
+      margin: 1rem 0;
+      overflow-x: auto;
+    }
+  
+    .btn-group {
+      flex-wrap: wrap;
+    }
+  
+    .btn {
+      margin: 0.25rem;
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    select, input[type="text"], input[type="number"] {
+      min-height: 44px;
+      padding: 0.5rem;
+      font-size: 16px;
+    }
+
+    .panel-heading {
+      padding: 1rem;
+      cursor: pointer;
+    }
+  
+    .panel-body {
+      padding: 1rem;
+    }
+
+    .info-group table {
+      width: 100%;
+    }
+  
+    .info-group td {
+      padding: 0.5rem;
+    }
+
+    .move-selector {
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body.dark-theme {
+        background: #1a1a1a;
+        color: #e0e0e0;
+      }
+  
+      .dark-theme .panel {
+        background: #2a2a2a;
+        border-color: #404040;
+      }
+  
+      .dark-theme .btn {
+        background: #333;
+        border-color: #404040;
+        color: #e0e0e0;
+      }
+  
+      .dark-theme select,
+      .dark-theme input[type="text"],
+      .dark-theme input[type="number"] {
+        background: #333;
+        border-color: #404040;
+        color: #e0e0e0;
+      }
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .damage-results {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 1rem;
+    }
+
+    .move1, .move2, .move3, .move4 {
+      margin-bottom: 1rem;
+    }
+
+    input[type="radio"],
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+    }
+  
+    label {
+      margin: 0.5rem 0;
+    }
+  }
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .wrapper {
+      padding: 1rem;
+    }
+  
+    .panel-group {
+      gap: 1rem;
+    }
+  
+    .poke-info {
+      width: calc(50% - 0.5rem);
+    }
+  }
+
+  .calculating {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .panel-collapse {
+    transition: max-height 0.3s ease-out;
+    overflow: hidden;
+  }
