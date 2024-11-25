@@ -60,7 +60,7 @@ $.fn.dataTableExt.oSort['damage48-desc'] = function(a, b) {
 
 async function loadProgressionPoints() {
     try {
-        const response = await fetch('/RR-Damage-Calculator/data/encounters.json');
+        const response = await fetch('./data/encounters.json');
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
