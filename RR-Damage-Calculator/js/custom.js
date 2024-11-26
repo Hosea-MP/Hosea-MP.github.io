@@ -77,20 +77,21 @@ document.addEventListener('DOMContentLoaded', function() {
             var pokemonButton = document.createElement('button');
             pokemonButton.innerText = pokemonName;
             pokemonButton.classList.add('pokemon-grid-item');
-
             pokemonButton.addEventListener('click', function() {
-                var selectedItems = gridContainer.getElementsByClassName('selected');
-                Array.from(selectedItems).forEach(function(item) {
-                    item.classList.remove('selected');
-                });
+    var selectedItems = gridContainer.getElementsByClassName('selected');
+    Array.from(selectedItems).forEach(function(item) {
+        item.classList.remove('selected');
+    });
 
-                this.classList.add('selected');
-                
-                var fullSetName = pokemonName + " (" + trainer + ")";
-                var setSelector = $('.poke-info').first().find('.set-selector');
-                setSelector.val(fullSetName).trigger('change');
-            });
-
+    this.classList.add('selected');
+    
+    var fullSetName = pokemonName + " (" + trainer + ")";
+    var setSelector = $('.poke-info').first().find('.set-selector');
+    
+    setSelector.val(fullSetName).trigger('change');
+    
+    setSelector.siblings('.select2-container').find('.select2-chosen').text(fullSetName);
+});
             gridContainer.appendChild(pokemonButton);
         });
     }
