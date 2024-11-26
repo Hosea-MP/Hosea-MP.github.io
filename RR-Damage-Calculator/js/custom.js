@@ -74,25 +74,43 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         sortedPokemonList.forEach(function(pokemonName) {
-            var pokemonButton = document.createElement('button');
-            pokemonButton.innerText = pokemonName;
-            pokemonButton.classList.add('pokemon-grid-item');
-            pokemonButton.addEventListener('click', function() {
-    var selectedItems = gridContainer.getElementsByClassName('selected');
-    Array.from(selectedItems).forEach(function(item) {
-        item.classList.remove('selected');
-    });
 
-    this.classList.add('selected');
-    
-    var fullSetName = pokemonName + " (" + trainer + ")";
-    var setSelector = $('.poke-info').first().find('.set-selector');
-    
-    setSelector.val(fullSetName).trigger('change');
-    
-    setSelector.siblings('.select2-container').find('.select2-chosen').text(fullSetName);
-});
-            gridContainer.appendChild(pokemonButton);
+            var pokemonContainer = document.createElement('div');
+            pokemonContainer.classList.add('pokemon-grid-item');
+
+            var spriteImg = document.createElement('img');
+            var spriteName = pokemonName.toLowerCase();
+            spriteImg.src = `./RR-Damage-Calculator/img/regular/${spriteName}.png`;
+            spriteImg.alt = pokemonName;
+            spriteImg.classList.add('pokemon-sprite');
+            
+            spriteImg.onerror = function() {
+                this.src = './RR-Damage-Calculator/img/regular/unknown.png';
+            };
+
+            var nameDiv = document.createElement('div');
+            nameDiv.innerText = pokemonName;
+            nameDiv.classList.add('pokemon-name');
+
+            pokemonContainer.appendChild(spriteImg);
+            pokemonContainer.appendChild(nameDiv);
+
+            pokemonContainer.addEventListener('click', function() {
+                var selectedItems = gridContainer.getElementsByClassName('selected');
+                Array.from(selectedItems).forEach(function(item) {
+                    item.classList.remove('selected');
+                });
+
+                this.classList.add('selected');
+                
+                var fullSetName = pokemonName + " (" + trainer + ")";
+                var setSelector = $('.poke-info').first().find('.set-selector');
+                
+                setSelector.val(fullSetName).trigger('change');
+                setSelector.siblings('.select2-container').find('.select2-chosen').text(fullSetName);
+            });
+
+            gridContainer.appendChild(pokemonContainer);
         });
     }
 });
