@@ -80,10 +80,6 @@ async function loadProgressionPoints() {
 
         select.innerHTML = '';
         
-        const defaultOption = document.createElement('option');
-        defaultOption.value = '';
-        defaultOption.text = 'Select a progression point...';
-        select.appendChild(defaultOption);
 
         data.forEach(point => {
             if (!point.boss || !point.location || !Array.isArray(point.encounters)) {

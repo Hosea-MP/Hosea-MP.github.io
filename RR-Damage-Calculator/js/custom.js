@@ -69,7 +69,11 @@ document.addEventListener('DOMContentLoaded', function() {
         var pokemonList = trainerPokemonMap[trainer];
         if (!pokemonList) return;
 
-        pokemonList.forEach(function(pokemonName) {
+        var sortedPokemonList = pokemonList.sort(function(a, b) {
+            return a.localeCompare(b);
+        });
+
+        sortedPokemonList.forEach(function(pokemonName) {
             var pokemonButton = document.createElement('button');
             pokemonButton.innerText = pokemonName;
             pokemonButton.classList.add('pokemon-grid-item');
