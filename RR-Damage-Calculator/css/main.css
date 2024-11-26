@@ -77,19 +77,51 @@ a img {
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
   }
+  
   .bs-btn.bs-btn-default {
-    position: relative !important;
     display: block;
-    margin: 0 auto 1rem;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 500;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-    background-color: #ffffff;
-    color: #374151;
+    margin: 1rem auto 2rem;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 6px;
+    border: 1px solid #2f9e44;
+    background-color: #40c057;
+    color: black;
     cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 200px;
+    max-width: 100%;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+hr {
+    margin: 2rem auto; 
+    width: 80%;
+}
+
+.bs-btn.bs-btn-default:hover {
+    background-color: #2f9e44;
+    border-color: #2b8a3e;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.bs-btn.bs-btn-default:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+    .bs-btn.bs-btn-default {
+        width: 90%;
+        padding: 10px 20px;
+        font-size: 14px;
+        min-width: 150px;
+    }
+}
+  
   .button {
     outline: none;
     cursor: pointer;

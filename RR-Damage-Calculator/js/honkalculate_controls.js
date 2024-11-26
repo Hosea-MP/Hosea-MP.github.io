@@ -355,22 +355,24 @@ function constructDataTable() {
 }
 
 function placeBsBtn() {
-	var honkalculator = "<button style='position:absolute' class='bs-btn bs-btn-default'>Honkalculate</button>";
-	$("#holder-2_wrapper").prepend(honkalculator);
-	$(".bs-btn").click(function() {
-		var formats = getSelectedTiers();
-		if (!formats.length) {
-			$(".bs-btn").popover({
-				content: "No format selected",
-				placement: "right"
-			}).popover('show');
-			setTimeout(function() {
-				$(".bs-btn").popover('destroy');
-			}, 1350);
-		}
-		table.clear();
-		performCalculations();
-	});
+    var honkalculator = "<button class='bs-btn bs-btn-default greenbutton'>Perform Calculations</button>";
+    
+    $("hr").before(honkalculator);
+    
+    $(".bs-btn").click(function() {
+        var formats = getSelectedTiers();
+        if (!formats.length) {
+            $(".bs-btn").popover({
+                content: "No format selected",
+                placement: "right"
+            }).popover('show');
+            setTimeout(function() {
+                $(".bs-btn").popover('destroy');
+            }, 1350);
+        }
+        table.clear();
+        performCalculations();
+    });
 }
 
 $(".mode").change(function() {
