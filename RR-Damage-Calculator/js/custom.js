@@ -15,40 +15,50 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function compareTrainerNames(a, b) {
+        var nameA = a.replace(/^\*/, '').toLowerCase();
+        var nameB = b.replace(/^\*/, '').toLowerCase();
+        return nameA.localeCompare(nameB);
+    }
+
+    var sortedTrainers = Object.keys(trainerPokemonMap).sort(compareTrainerNames);
+
     var progressionSelect = document.getElementById('progression-select');
     if (progressionSelect) {
-        for (var trainer in trainerPokemonMap) {
+        sortedTrainers.forEach(function(trainer) {
             var option = document.createElement('option');
             option.value = trainer;
             option.text = trainer;
             progressionSelect.appendChild(option);
-        }
+        });
     }
 
     var trainerSelect = document.getElementById('trainer-select');
     if (trainerSelect) {
-        for (var trainer in trainerPokemonMap) {
+        sortedTrainers.forEach(function(trainer) {
             var option = document.createElement('option');
             option.value = trainer;
             option.text = trainer;
             trainerSelect.appendChild(option);
-        }
+        });
     }
 
-    if (progressionSelect.options.length > 0) {
+    if (progressionSelect && progressionSelect.options.length > 0) {
         progressionSelect.selectedIndex = 0;
     }
 
-    if (trainerSelect.options.length > 0) {
+    if (trainerSelect && trainerSelect.options.length > 0) {
         trainerSelect.selectedIndex = 0;
         var selectedTrainer = trainerSelect.value;
         displayTrainerPokemon(selectedTrainer);
     }
 
-    trainerSelect.addEventListener('change', function() {
-        var selectedTrainer = this.value;
-        displayTrainerPokemon(selectedTrainer);
-    });
+    if (trainerSelect) {
+        trainerSelect.addEventListener('change', function() {
+            var selectedTrainer = this.value;
+            displayTrainerPokemon(selectedTrainer);
+        });
+    }
 
     function displayTrainerPokemon(trainer) {
         var gridContainer = document.getElementById('trainer-pokemon-grid');
@@ -71,59 +81,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 this.classList.add('selected');
-                populatePokemonInfo(trainer, pokemonName);
+                
+                var fullSetName = pokemonName + " (" + trainer + ")";
+                var setSelector = $('.poke-info').first().find('.set-selector');
+                setSelector.val(fullSetName).trigger('change');
             });
 
             gridContainer.appendChild(pokemonButton);
-        });
-    }
-
-    function populatePokemonInfo(trainer, pokemonName) {
-        var setData = SETDEX_SV[pokemonName][trainer];
-        if (!setData) return;
-
-        var pokeInfoPanel = document.getElementById('p1');
-        if (!pokeInfoPanel) return;
-
-        var setSelector = $(pokeInfoPanel).find('.set-selector');
-        setSelector.val(pokemonName).trigger('change');
-
-        var levelInput = $(pokeInfoPanel).find('.level');
-        levelInput.val(setData.level).trigger('keyup');
-
-        var natureSelect = $(pokeInfoPanel).find('.nature');
-        natureSelect.val(setData.nature).trigger('change');
-
-        var abilitySelect = $(pokeInfoPanel).find('.ability');
-        abilitySelect.val(setData.ability).trigger('change');
-
-        var itemSelect = $(pokeInfoPanel).find('.item');
-        itemSelect.val(setData.item || '').trigger('change');
-
-        for (var i = 0; i < 4; i++) {
-            var moveSelector = $(pokeInfoPanel).find('.move' + (i + 1) + ' .move-selector');
-            moveSelector.val(setData.moves[i] || '(No Move)').trigger('change');
-        }
-
-        updateStats(pokeInfoPanel, pokemonName);
-    }
-
-    function updateStats(pokeInfoPanel, pokemonName) {
-        if (typeof POKEDEX_SV === 'undefined') {
-            console.error('POKEDEX_SV is not defined. Make sure that species.js is loaded before this script.');
-            return;
-        }
-
-        var baseStats = POKEDEX_SV[pokemonName] ? POKEDEX_SV[pokemonName].bs : null;
-        if (!baseStats) {
-            console.error('Base stats not found for ' + pokemonName);
-            return;
-        }
-
-        var stats = ['hp', 'at', 'df', 'sa', 'sd', 'sp'];
-        stats.forEach(function(stat) {
-            var baseInput = $(pokeInfoPanel).find('.' + stat + ' .base');
-            baseInput.val(baseStats[stat.toUpperCase()]).trigger('keyup');
         });
     }
 });
